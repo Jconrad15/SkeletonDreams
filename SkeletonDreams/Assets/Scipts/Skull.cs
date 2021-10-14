@@ -6,58 +6,65 @@ namespace SkeletonDreams
 {
     public class Skull: BoneSegment
     {
-        private int resolution = 5;
+        private float a;
+        private float b;
 
+        public Vector3 NeckPos { get; protected set; }
 
         /// <summary>
         /// Standard skull constructor
         /// </summary>
         public Skull(Vector3 startPosition)
         {
-            Length = 2f;
-            MaxWidth = 0.5f;
+            XSize = 2;
+            YSize = 30;
 
-            ConnectionPoints = new Vector3[1] { startPosition };
+            a = Random.Range(0.4f, 1.2f);
+            b = Random.Range(0.4f, 1.2f);
+
+            PlacedPos = startPosition;
 
             // Create skull mesh
             BoneMesh = new Mesh();
 
-            // Determine Vertices
-            Vector3[] vertices = new Vector3[resolution * 2];
+            DetermineMeshVariables(out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
 
-            Vector3 currentPos = startPosition;
-            for (int i = 0; i < resolution; i++)
-            {
-                vertices[i] = new Vector3(currentPos.x - (MaxWidth/2f), currentPos.y, currentPos.z);
-                vertices[i+1] = new Vector3(currentPos.x + (MaxWidth / 2f), currentPos.y, currentPos.z);
+            ConvertToEllipse(vertices);
 
-                currentPos = new Vector3(currentPos.x, currentPos.y + Length/resolution, currentPos.z);
-            }
-            BoneMesh.vertices = vertices;
+            SetBoneMesh(vertices, uv, triangles);
 
-            // Determine UV
-            //Vector2[] UV = new Vector2[resolution * 2];
-
-
-
-
-            // Determine Triangles
-            int[] triangles = new int[resolution * 2 * 6];
-            for (int ti = 0, vi = 0, y = 0; y < 2; y++, vi++)
-            {
-                for (int x = 0; x < resolution; x++, ti += 6, vi++)
-                {
-                    triangles[ti] = vi;
-                    triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                    triangles[ti + 4] = triangles[ti + 1] = vi + resolution + 1;
-                    triangles[ti + 5] = vi + resolution + 2;
-                } 
-            }
-            BoneMesh.triangles = triangles;
-
-            BoneMesh.RecalculateNormals();
-
+            Vector3 newVect = startPosition;
+            newVect.y = newVect.y - ((a + b) / 2f);
+            NeckPos = newVect;
         }
+
+        /// <summary>
+        /// Converts to polar coords and squishes to an psuedo ellipse shape.
+        /// </summary>
+        /// <param name="vertices"></param>
+        private void ConvertToEllipse(Vector3[] vertices)
+        {
+            // Convert to polar coords to form an ellipse
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                float theta = (vertices[i].y / YSize) * 2f * Mathf.PI;
+                float pointRadius = (vertices[i].x / XSize) * a * b;
+
+                Vector3 tempVector;
+                tempVector.x = (pointRadius /
+                                Mathf.Sqrt((b * Mathf.Cos(theta)* Mathf.Cos(theta)) +
+                                           (a * Mathf.Sin(theta) * Mathf.Sin(theta)))
+                                * Mathf.Cos(theta));
+
+                tempVector.y = (pointRadius /
+                                Mathf.Sqrt(b * (Mathf.Cos(theta) * Mathf.Cos(theta)) +
+                                          (a * Mathf.Sin(theta) * Mathf.Sin(theta)))
+                                * Mathf.Sin(theta));
+                tempVector.z = 0f;
+                vertices[i] = tempVector;
+            }
+        }
+
 
 
 

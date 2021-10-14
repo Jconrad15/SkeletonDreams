@@ -6,30 +6,42 @@ namespace SkeletonDreams
 {
     public class SkeletonGenerator : MonoBehaviour
     {
+        private List<GameObject> drawnGameObjects = new List<GameObject>();
 
-        // Start is called before the first frame update
-        void Start()
-        {
 
-        }
-
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
+                DestroyLastSkeleton();
                 GenerateSkeleton();
             }
         }
 
+        /// <summary>
+        /// Generates a new Skeleton.
+        /// </summary>
         private void GenerateSkeleton()
         {
-            Vector3 startPosition = new Vector3(0, 1, 0);
-            Skull newSkull = new Skull(startPosition);
+            Vector3 startPosition = new Vector3(0, 2, 0);
 
-            GameObject skull_GO = new GameObject();
-            MeshFilter skull_mf = skull_GO.AddComponent<MeshFilter>();
-            skull_mf.mesh = newSkull.BoneMesh;
+            Skeleton skeleton = new Skeleton(startPosition);
+
+            drawnGameObjects = Drawing.DrawFullSkeleton(skeleton);
         }
+
+        /// <summary>
+        /// Destroys the GameObjects of the last Skeleton.
+        /// </summary>
+        private void DestroyLastSkeleton()
+        {
+            for (int i = 0; i < drawnGameObjects.Count; i++)
+            {
+                Destroy(drawnGameObjects[i]);
+            }
+            drawnGameObjects.Clear();
+        }
+
+
     }
 }
