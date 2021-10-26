@@ -2,71 +2,63 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SkeletonDreams
+public class Skull
 {
-    public class Skull: BoneSegment
+    public List<Vector3> Positions { get; protected set; }
+
+    private float a;
+    private float b;
+    private float c;
+
+    private float p;
+    private float q;
+
+    private int detail;
+
+    public Skull(int setDetail)
     {
-        private float a;
-        private float b;
+        Positions = new List<Vector3>();
+        detail = setDetail;
 
-        public Vector3 NeckPos { get; protected set; }
+        SetValues();
 
-        /// <summary>
-        /// Standard skull constructor
-        /// </summary>
-        public Skull(Vector3 startPosition)
+        CreatePositions();
+    }
+
+    private void SetValues()
+    {
+        a = 1;
+        b = 1;
+        c = 1;
+
+        p = 0.998f;
+        q = 0.125f;
+    }
+
+    private void CreatePositions()
+    {
+        float t = 0;
+        for (int i = 0; i < detail; i++)
         {
-            XSize = 2;
-            YSize = 30;
 
-            a = Random.Range(0.4f, 1.2f);
-            b = Random.Range(0.4f, 1.2f);
-
-            PlacedPos = startPosition;
-
-            // Create skull mesh
-            BoneMesh = new Mesh();
-
-            DetermineMeshVariables(out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
-
-            ConvertToEllipse(vertices);
-
-            SetBoneMesh(vertices, uv, triangles);
-
-            Vector3 newVect = startPosition;
-            newVect.y = newVect.y - ((a + b) / 2f);
-            NeckPos = newVect;
-        }
-
-        /// <summary>
-        /// Converts to polar coords and squishes to an psuedo ellipse shape.
-        /// </summary>
-        /// <param name="vertices"></param>
-        private void ConvertToEllipse(Vector3[] vertices)
-        {
-            // Convert to polar coords to form an ellipse
-            for (int i = 0; i < vertices.Length; i++)
+            Vector3 newPos = new Vector3
             {
-                float theta = (vertices[i].y / YSize) * 2f * Mathf.PI;
-                float pointRadius = (vertices[i].x / XSize) * a * b;
+                x =
+                Mathf.Cos(t) * (a * Mathf.Sin(t) +
+                                b * Mathf.Sqrt(1 - p * Mathf.Cos(t) * Mathf.Cos(t)) +
+                                c * Mathf.Sqrt(1 - q * Mathf.Cos(t) * Mathf.Cos(t))),
 
-                Vector3 tempVector;
-                tempVector.x = (pointRadius /
-                                Mathf.Sqrt((b * Mathf.Cos(theta)* Mathf.Cos(theta)) +
-                                           (a * Mathf.Sin(theta) * Mathf.Sin(theta)))
-                                * Mathf.Cos(theta));
+                y =
+                Mathf.Sin(t) * (a * Mathf.Sin(t) +
+                                b * Mathf.Sqrt(1 - p * Mathf.Cos(t) * Mathf.Cos(t)) +
+                                c * Mathf.Sqrt(1 - q * Mathf.Cos(t) * Mathf.Cos(t))),
 
-                tempVector.y = (pointRadius /
-                                Mathf.Sqrt(b * (Mathf.Cos(theta) * Mathf.Cos(theta)) +
-                                          (a * Mathf.Sin(theta) * Mathf.Sin(theta)))
-                                * Mathf.Sin(theta));
-                tempVector.z = 0f;
-                vertices[i] = tempVector;
-            }
+                z = 0
+            };
+
+            Positions.Add(newPos);
+
+            t += 1 / (float)detail;
         }
-
-
-
-
     }
 }
