@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skull
+public class SkullOutLine
 {
     public List<Vector3> Positions { get; protected set; }
 
@@ -15,7 +15,7 @@ public class Skull
 
     private int detail;
 
-    public Skull(int setDetail)
+    public SkullOutLine(int setDetail)
     {
         Positions = new List<Vector3>();
         detail = setDetail;
@@ -27,12 +27,12 @@ public class Skull
 
     private void SetValues()
     {
-        a = 1;
-        b = 1;
-        c = 1;
+        a = Random.Range(0.7f, 1f);
+        b = Random.Range(0.7f, 1f);
+        c = Random.Range(0.7f, 1f);
 
-        p = 0.998f;
-        q = 0.125f;
+        p = Random.Range(0.9f, 1f); //0.998f;
+        q = Random.Range(0.05f, 0.3f); //0.125f;
     }
 
     private void CreatePositions()
@@ -58,7 +58,7 @@ public class Skull
 
             Positions.Add(newPos);
 
-            t += 1 / (float)detail;
+            t += 2*Mathf.PI / (float)detail;
         }
     }
 }
